@@ -6,6 +6,10 @@ public class PounceGameManager : MonoBehaviour
     [Header("Win Condition")]
     public float winThreshold = 85f;
 
+    [Header("Robots")]
+    public int robotCount = 5;
+    public float robotSpeed = 0.8f;
+
     private PlayerController _player;
     private GridRenderer _gridRenderer;
     private HUDManager _hud;
@@ -13,12 +17,14 @@ public class PounceGameManager : MonoBehaviour
 
     void Start()
     {
-        _player = FindObjectOfType<PlayerController>();
-        _gridRenderer = FindObjectOfType<GridRenderer>();
-        _hud = FindObjectOfType<HUDManager>();
+        _player = FindFirstObjectByType<PlayerController>();
+        _gridRenderer = FindFirstObjectByType<GridRenderer>();
+        _hud = FindFirstObjectByType<HUDManager>();
         if (_hud == null) _hud = gameObject.AddComponent<HUDManager>();
 
         _player.OnTrailComplete += HandleTrailComplete;
+
+        SpawnRobots();
 
         float startPct = GridManager.Instance.GetCapturedPercentage();
         _hud.UpdateProgress(startPct);
@@ -28,6 +34,17 @@ public class PounceGameManager : MonoBehaviour
     {
         if (_player != null)
             _player.OnTrailComplete -= HandleTrailComplete;
+    }
+
+    void SpawnRobots()
+    {
+        for (int i = 0; i < robotCount; i++)
+        {
+            var go = new GameObject($"Robot_{i}");
+            go.AddComponent<SpriteRenderer>();
+            var robot = go.AddComponent<Robot>();
+            robot.speed = robotSpeed;
+        }
     }
 
     void HandleTrailComplete(List<Vector2Int> trailCells)

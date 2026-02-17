@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        _gridRenderer = FindObjectOfType<GridRenderer>();
+        _gridRenderer = FindFirstObjectByType<GridRenderer>();
 
         _gridX = GridManager.Cols / 2;
         _gridY = GridManager.Rows / 2;

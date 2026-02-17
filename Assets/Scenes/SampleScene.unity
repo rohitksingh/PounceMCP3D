@@ -370,6 +370,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PounceGameManager
   winThreshold: 85
+  robotCount: 5
+  robotSpeed: 0.8
 --- !u!4 &1174631192
 Transform:
   m_ObjectHideFlags: 0
