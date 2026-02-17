@@ -25,6 +25,18 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < Rows; y++)
                 _grid[x, y] = CellState.Void;
 
+        // Captured border (1-cell thick perimeter)
+        for (int x = 0; x < Cols; x++)
+        {
+            _grid[x, 0] = CellState.Captured;
+            _grid[x, Rows - 1] = CellState.Captured;
+        }
+        for (int y = 0; y < Rows; y++)
+        {
+            _grid[0, y] = CellState.Captured;
+            _grid[Cols - 1, y] = CellState.Captured;
+        }
+
         // Center starting island
         int cx = Cols / 2;
         int cy = Rows / 2;
