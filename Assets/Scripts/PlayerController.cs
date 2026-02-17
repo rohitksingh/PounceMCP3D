@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,30 +7,38 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveDelay = 0.15f;  // seconds between grid steps
-    public float lerpSpeed = 20f;    // visual smoothing speed
+    public float moveDelay = 0.15f;
+    public float lerpSpeed = 20f;
+
+    // Fired when the player closes a trail back onto captured territory
+    public event Action<List<Vector2Int>> OnTrailComplete;
 
     private int _gridX, _gridY;
     private Vector3 _targetWorldPos;
     private float _moveTimer;
     private Vector2Int _queuedDir;
 
+    private bool _isDrawing;
+    private List<Vector2Int> _trailCells = new List<Vector2Int>();
+
+    private GridRenderer _gridRenderer;
+
     void Awake()
     {
-        // Build a simple 8x8 orange square sprite at runtime (no asset needed)
         var sr = GetComponent<SpriteRenderer>();
         var tex = new Texture2D(8, 8, TextureFormat.RGBA32, false);
         tex.filterMode = FilterMode.Point;
         var fill = new Color(1f, 0.5f, 0f);
-        for (int i = 0; i < 8 * 8; i++) tex.SetPixel(i % 8, i / 8, fill);
+        for (int i = 0; i < 64; i++) tex.SetPixel(i % 8, i / 8, fill);
         tex.Apply();
         sr.sprite = Sprite.Create(tex, new Rect(0, 0, 8, 8), new Vector2(0.5f, 0.5f), 100f);
-        sr.sortingOrder = 1; // render above grid
+        sr.sortingOrder = 1;
     }
 
     void Start()
     {
-        // Spawn at center of the starting island
+        _gridRenderer = FindObjectOfType<GridRenderer>();
+
         _gridX = GridManager.Cols / 2;
         _gridY = GridManager.Rows / 2;
         _targetWorldPos = GridManager.GridToWorld(_gridX, _gridY);
@@ -61,13 +71,40 @@ public class PlayerController : MonoBehaviour
         int nx = _gridX + _queuedDir.x;
         int ny = _gridY + _queuedDir.y;
 
-        // Clamp to grid bounds
         if (nx < 0 || nx >= GridManager.Cols || ny < 0 || ny >= GridManager.Rows) return;
+
+        var gm = GridManager.Instance;
+        CellState nextCell = gm.GetCell(nx, ny);
+
+        // Block movement onto own trail (death handled in Step 4)
+        if (nextCell == CellState.Trail) return;
 
         _gridX = nx;
         _gridY = ny;
         _targetWorldPos = GridManager.GridToWorld(_gridX, _gridY);
         _moveTimer = moveDelay;
+
+        HandleTrail(nextCell, nx, ny, gm);
+    }
+
+    void HandleTrail(CellState cellState, int x, int y, GridManager gm)
+    {
+        if (cellState == CellState.Void)
+        {
+            // Step into void — mark as trail and start/continue drawing
+            gm.SetCell(x, y, CellState.Trail);
+            _trailCells.Add(new Vector2Int(x, y));
+            _gridRenderer?.RefreshCell(x, y);
+            _isDrawing = true;
+        }
+        else if (cellState == CellState.Captured && _isDrawing)
+        {
+            // Returned to captured territory — trail is complete
+            _isDrawing = false;
+            var completedTrail = new List<Vector2Int>(_trailCells);
+            _trailCells.Clear();
+            OnTrailComplete?.Invoke(completedTrail);
+        }
     }
 
     void SmoothMove()
@@ -76,4 +113,5 @@ public class PlayerController : MonoBehaviour
     }
 
     public Vector2Int GridPosition => new Vector2Int(_gridX, _gridY);
+    public bool IsDrawing => _isDrawing;
 }
