@@ -55,6 +55,18 @@ public class PounceGameManager : MonoBehaviour
         }
     }
 
+    void DestroyTrappedRobots()
+    {
+        var gm = GridManager.Instance;
+        var robots = FindObjectsByType<Robot>(FindObjectsSortMode.None);
+        foreach (var robot in robots)
+        {
+            var cell = GridManager.WorldToGrid(robot.transform.position);
+            if (gm.GetCell(cell.x, cell.y) == CellState.Captured)
+                Destroy(robot.gameObject);
+        }
+    }
+
     void HandleRobotHitTrail()
     {
         if (_levelComplete || _isDying) return;
@@ -77,6 +89,7 @@ public class PounceGameManager : MonoBehaviour
         if (_levelComplete) return;
 
         FloodFill.CaptureTerritory(trailCells);
+        DestroyTrappedRobots();
         _gridRenderer.Refresh();
 
         float pct = GridManager.Instance.GetCapturedPercentage();
