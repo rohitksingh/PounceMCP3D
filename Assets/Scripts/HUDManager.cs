@@ -112,7 +112,10 @@ public class HUDManager : MonoBehaviour
 
     public void UpdateLives(int lives)
     {
-        _livesText.text = lives > 0 ? new string('♥', lives).Replace("", " ").Trim() : "✕";
+        if (lives <= 0) { _livesText.text = "✕"; return; }
+        var parts = new string[lives];
+        for (int i = 0; i < lives; i++) parts[i] = "♥";
+        _livesText.text = string.Join(" ", parts);
     }
 
     public void ShowWin()
