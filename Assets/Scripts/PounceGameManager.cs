@@ -16,6 +16,7 @@ public class PounceGameManager : MonoBehaviour
         _player = FindObjectOfType<PlayerController>();
         _gridRenderer = FindObjectOfType<GridRenderer>();
         _hud = FindObjectOfType<HUDManager>();
+        if (_hud == null) _hud = gameObject.AddComponent<HUDManager>();
 
         _player.OnTrailComplete += HandleTrailComplete;
 
