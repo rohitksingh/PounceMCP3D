@@ -47,6 +47,22 @@ public class GridManager : MonoBehaviour
         _grid[x, y] = state;
     }
 
+    /// <summary>Converts grid coordinates to world position (cell center).</summary>
+    public static Vector3 GridToWorld(int x, int y, float z = -0.1f)
+    {
+        float wx = -4f + x * (CellSize / 100f) + (CellSize / 200f);
+        float wy = -3f + y * (CellSize / 100f) + (CellSize / 200f);
+        return new Vector3(wx, wy, z);
+    }
+
+    /// <summary>Converts world position to nearest grid coordinates.</summary>
+    public static Vector2Int WorldToGrid(Vector3 world)
+    {
+        int x = Mathf.FloorToInt((world.x + 4f) / (CellSize / 100f));
+        int y = Mathf.FloorToInt((world.y + 3f) / (CellSize / 100f));
+        return new Vector2Int(x, y);
+    }
+
     public float GetCapturedPercentage()
     {
         int captured = 0;
