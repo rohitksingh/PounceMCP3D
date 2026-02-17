@@ -8,18 +8,19 @@ public class PounceGameManager : MonoBehaviour
 
     private PlayerController _player;
     private GridRenderer _gridRenderer;
+    private HUDManager _hud;
     private bool _levelComplete;
 
     void Start()
     {
         _player = FindObjectOfType<PlayerController>();
         _gridRenderer = FindObjectOfType<GridRenderer>();
+        _hud = FindObjectOfType<HUDManager>();
 
         _player.OnTrailComplete += HandleTrailComplete;
 
-        // Show initial progress (starting island is ~0.2%)
         float startPct = GridManager.Instance.GetCapturedPercentage();
-        HUDManager.Instance.UpdateProgress(startPct);
+        _hud.UpdateProgress(startPct);
     }
 
     void OnDestroy()
@@ -36,12 +37,12 @@ public class PounceGameManager : MonoBehaviour
         _gridRenderer.Refresh();
 
         float pct = GridManager.Instance.GetCapturedPercentage();
-        HUDManager.Instance.UpdateProgress(pct);
+        _hud.UpdateProgress(pct);
 
         if (pct >= winThreshold)
         {
             _levelComplete = true;
-            HUDManager.Instance.ShowWin();
+            _hud.ShowWin();
             Debug.Log($"Level complete! {pct:F1}% captured.");
         }
     }
