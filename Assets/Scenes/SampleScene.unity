@@ -369,6 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca5e30d3596ba4249bc8ce06c04be2a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PounceGameManager
+  winThreshold: 85
 --- !u!4 &1174631192
 Transform:
   m_ObjectHideFlags: 0

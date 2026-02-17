@@ -3,8 +3,12 @@ using UnityEngine;
 
 public class PounceGameManager : MonoBehaviour
 {
+    [Header("Win Condition")]
+    public float winThreshold = 85f;
+
     private PlayerController _player;
     private GridRenderer _gridRenderer;
+    private bool _levelComplete;
 
     void Start()
     {
@@ -12,6 +16,10 @@ public class PounceGameManager : MonoBehaviour
         _gridRenderer = FindObjectOfType<GridRenderer>();
 
         _player.OnTrailComplete += HandleTrailComplete;
+
+        // Show initial progress (starting island is ~0.2%)
+        float startPct = GridManager.Instance.GetCapturedPercentage();
+        HUDManager.Instance.UpdateProgress(startPct);
     }
 
     void OnDestroy()
@@ -22,10 +30,19 @@ public class PounceGameManager : MonoBehaviour
 
     void HandleTrailComplete(List<Vector2Int> trailCells)
     {
+        if (_levelComplete) return;
+
         FloodFill.CaptureTerritory(trailCells);
         _gridRenderer.Refresh();
 
         float pct = GridManager.Instance.GetCapturedPercentage();
-        Debug.Log($"Territory: {pct:F1}%");
+        HUDManager.Instance.UpdateProgress(pct);
+
+        if (pct >= winThreshold)
+        {
+            _levelComplete = true;
+            HUDManager.Instance.ShowWin();
+            Debug.Log($"Level complete! {pct:F1}% captured.");
+        }
     }
 }
