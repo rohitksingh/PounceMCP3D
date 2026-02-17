@@ -7,6 +7,7 @@ public class HUDManager : MonoBehaviour
 
     private Image _progressFill;
     private Text _percentageText;
+    private Text _livesText;
     private Text _winText;
 
     void Awake()
@@ -69,6 +70,22 @@ public class HUDManager : MonoBehaviour
         textRect.offsetMin = new Vector2(-80f, 30f);
         textRect.offsetMax = new Vector2(-10f, 50f);
 
+        // --- Lives (top-left) ---
+        var livesGO = new GameObject("LivesText");
+        livesGO.transform.SetParent(canvasGO.transform, false);
+        _livesText = livesGO.AddComponent<Text>();
+        _livesText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        _livesText.fontSize = 20;
+        _livesText.color = new Color(1f, 0.3f, 0.3f);
+        _livesText.alignment = TextAnchor.UpperLeft;
+        _livesText.text = "♥ ♥ ♥";
+        var livesRect = livesGO.GetComponent<RectTransform>();
+        livesRect.anchorMin = new Vector2(0f, 1f);
+        livesRect.anchorMax = new Vector2(0f, 1f);
+        livesRect.pivot     = new Vector2(0f, 1f);
+        livesRect.offsetMin = new Vector2(10f, -40f);
+        livesRect.offsetMax = new Vector2(160f, -10f);
+
         // --- Win message (hidden by default) ---
         var winGO = new GameObject("WinText");
         winGO.transform.SetParent(canvasGO.transform, false);
@@ -93,8 +110,22 @@ public class HUDManager : MonoBehaviour
         _percentageText.text = $"{percentage:F1}%";
     }
 
+    public void UpdateLives(int lives)
+    {
+        _livesText.text = lives > 0 ? new string('♥', lives).Replace("", " ").Trim() : "✕";
+    }
+
     public void ShowWin()
     {
+        _winText.color = new Color(0.95f, 0.77f, 0.06f);
+        _winText.text = "LEVEL CLEAR!";
+        _winText.gameObject.SetActive(true);
+    }
+
+    public void ShowGameOver()
+    {
+        _winText.color = new Color(0.9f, 0.2f, 0.2f);
+        _winText.text = "GAME OVER";
         _winText.gameObject.SetActive(true);
     }
 }

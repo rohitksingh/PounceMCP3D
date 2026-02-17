@@ -372,6 +372,7 @@ MonoBehaviour:
   winThreshold: 85
   robotCount: 5
   robotSpeed: 0.8
+  startingLives: 3
 --- !u!4 &1174631192
 Transform:
   m_ObjectHideFlags: 0

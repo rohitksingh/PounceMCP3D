@@ -112,6 +112,27 @@ public class PlayerController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, _targetWorldPos, lerpSpeed * Time.deltaTime);
     }
 
+    /// <summary>Clears trail and respawns player at starting island center.</summary>
+    public void Respawn()
+    {
+        // Clear trail cells back to Void
+        foreach (var cell in _trailCells)
+        {
+            GridManager.Instance.SetCell(cell.x, cell.y, CellState.Void);
+            _gridRenderer?.RefreshCell(cell.x, cell.y);
+        }
+        _trailCells.Clear();
+        _isDrawing = false;
+        _queuedDir = Vector2Int.zero;
+        _moveTimer = 0f;
+
+        // Respawn at center island
+        _gridX = GridManager.Cols / 2;
+        _gridY = GridManager.Rows / 2;
+        _targetWorldPos = GridManager.GridToWorld(_gridX, _gridY);
+        transform.position = _targetWorldPos;
+    }
+
     public Vector2Int GridPosition => new Vector2Int(_gridX, _gridY);
     public bool IsDrawing => _isDrawing;
 }

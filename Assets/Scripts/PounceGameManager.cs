@@ -10,10 +10,15 @@ public class PounceGameManager : MonoBehaviour
     public int robotCount = 5;
     public float robotSpeed = 0.8f;
 
+    [Header("Lives")]
+    public int startingLives = 3;
+
     private PlayerController _player;
     private GridRenderer _gridRenderer;
     private HUDManager _hud;
     private bool _levelComplete;
+    private int _lives;
+    private bool _isDying;
 
     void Start()
     {
@@ -24,10 +29,12 @@ public class PounceGameManager : MonoBehaviour
 
         _player.OnTrailComplete += HandleTrailComplete;
 
+        _lives = startingLives;
         SpawnRobots();
 
         float startPct = GridManager.Instance.GetCapturedPercentage();
         _hud.UpdateProgress(startPct);
+        _hud.UpdateLives(_lives);
     }
 
     void OnDestroy()
@@ -44,6 +51,24 @@ public class PounceGameManager : MonoBehaviour
             go.AddComponent<SpriteRenderer>();
             var robot = go.AddComponent<Robot>();
             robot.speed = robotSpeed;
+            robot.OnHitTrail += HandleRobotHitTrail;
+        }
+    }
+
+    void HandleRobotHitTrail()
+    {
+        if (_levelComplete || _isDying) return;
+
+        _lives--;
+        _hud.UpdateLives(_lives);
+        _isDying = true;
+        _player.Respawn();
+        _isDying = false;
+
+        if (_lives <= 0)
+        {
+            _levelComplete = true;
+            _hud.ShowGameOver();
         }
     }
 

@@ -5,6 +5,8 @@ public class Robot : MonoBehaviour
 {
     public float speed = 0.8f;
 
+    public event System.Action OnHitTrail;
+
     private Vector2 _velocity;
 
     void Awake()
@@ -60,6 +62,11 @@ public class Robot : MonoBehaviour
         }
 
         transform.position = new Vector3(pos.x + dx, pos.y + dy, pos.z);
+
+        // Check if now on a trail cell
+        var current = GridManager.WorldToGrid(transform.position);
+        if (GridManager.Instance.GetCell(current.x, current.y) == CellState.Trail)
+            OnHitTrail?.Invoke();
     }
 
     bool IsBlocked(Vector2Int cell, GridManager gm)
