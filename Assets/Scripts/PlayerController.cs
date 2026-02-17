@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class PlayerController : MonoBehaviour
@@ -43,10 +44,13 @@ public class PlayerController : MonoBehaviour
 
     void GatherInput()
     {
-        if      (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))    _queuedDir = Vector2Int.up;
-        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))  _queuedDir = Vector2Int.down;
-        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))  _queuedDir = Vector2Int.left;
-        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) _queuedDir = Vector2Int.right;
+        var kb = Keyboard.current;
+        if (kb == null) return;
+
+        if      (kb.wKey.isPressed || kb.upArrowKey.isPressed)    _queuedDir = Vector2Int.up;
+        else if (kb.sKey.isPressed || kb.downArrowKey.isPressed)  _queuedDir = Vector2Int.down;
+        else if (kb.aKey.isPressed || kb.leftArrowKey.isPressed)  _queuedDir = Vector2Int.left;
+        else if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) _queuedDir = Vector2Int.right;
     }
 
     void TickMovement()
